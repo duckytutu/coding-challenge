@@ -1,0 +1,41 @@
+body {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  min-width: 360px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  display: none;
+}
+
+input:invalid, select:invalid {
+  border-color: #dc3545;
+}
+
+input:valid, select:valid {
+  border-color: #28a745;
+}
+
+.currency-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.currency-icon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+.currency-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}

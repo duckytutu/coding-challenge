@@ -1,0 +1,65 @@
+<html>
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fancy Form</title>
+
+  <!-- You may add more stuff here -->
+  <link href="style.css" rel="stylesheet" />
+</head>
+
+<body>
+
+  <!-- You may reorganise the whole HTML, as long as your form achieves the same effect. -->
+  <form onsubmit="return !1" novalidate>
+    <h1>Swap</h1>
+    <div>
+      <label for="input-amount">Amount to send</label>
+      <input 
+        id="input-amount" 
+        type="number" 
+        min="0"
+        step="any" 
+        required 
+        pattern="[0-9]*\.?[0-9]+"
+      />
+      <div class="error-message" id="input-amount-error">Please enter a valid amount</div>
+    </div>
+
+    <div>
+      <label for="currency-from">Currency</label>
+      <div class="currency-container">
+        <select id="currency-from" required>
+          <option value="">Select a currency</option>
+        </select>
+        <img id="currency-from-icon" class="currency-icon" style="display: none;" alt="" />
+      </div>
+      <div class="error-message" id="currency-from-error">Please select a currency</div>
+    </div>
+
+    <div>
+      <label for="currency-to">Currency</label>
+      <div class="currency-container">
+        <select id="currency-to" required>
+          <option value="">Select a currency</option>
+        </select>
+        <img id="currency-to-icon" class="currency-icon" style="display: none;" alt="" />
+      </div>
+      <div class="error-message" id="currency-to-error">Please select a currency</div>
+    </div>
+
+    <div>
+      <label for="output-amount">Amount to receive</label>
+      <input 
+        id="output-amount" 
+        type="number" 
+        readonly
+      />
+    </div>
+
+    <button type="submit">CONFIRM SWAP</button>
+  </form>
+  <script src="script.js"></script>
+</body>
+
+</html>
