@@ -28,7 +28,7 @@ function App() {
   const [currencies, setCurrencies] = useState<string[]>([]);
   const [convertedAmount, setConvertedAmount] = useState<string>('');
 
-  const { register, handleSubmit, watch, formState: { errors } } = useForm<FormData>();
+  const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<FormData>();
 
   useEffect(() => {
     fetchCurrencyData();
@@ -69,6 +69,27 @@ function App() {
     }
   };
 
+  const handleSwapCurrencies = () => {
+    const currentFrom = watch('fromCurrency');
+    const currentTo = watch('toCurrency');
+    const currentAmount = watch('amount');
+    
+    // Swap currencies
+    setValue('fromCurrency', currentTo);
+    setValue('toCurrency', currentFrom);
+    
+    // Recalculate the converted amount if we have all required values
+    if (currentAmount > 0 && currentTo && currentFrom) {
+      const fromPrice = currencyPrices[currentTo].price; // Note: using swapped currencies
+      const toPrice = currencyPrices[currentFrom].price;
+      
+      const amountInUSD = currentAmount * fromPrice;
+      const converted = amountInUSD / toPrice;
+      
+      setConvertedAmount(converted.toFixed(6));
+    }
+  };
+
   const fromCurrency = watch('fromCurrency');
   const toCurrency = watch('toCurrency');
 
@@ -82,7 +103,7 @@ function App() {
             <div className="flex-1 space-y-6">
               <div className="space-y-2">
                 <label htmlFor="fromCurrency" className="block text-sm font-medium text-gray-700">
-                  From Currency
+                  From
                 </label>
                 <div className="flex items-center space-x-3">
                   <select
@@ -110,7 +131,7 @@ function App() {
                   <p className="mt-1 text-sm text-red-600">{errors.fromCurrency.message}</p>
                 )}
               </div>
-              
+
               <div className="space-y-2">
                 <label htmlFor="amount" className="block text-sm font-medium text-gray-700">
                   Amount to send
@@ -133,13 +154,19 @@ function App() {
             </div>
 
             <div className="flex flex-col items-center justify-center">
-              <ArrowRightLeft className="w-12 h-12 text-gray-400" />
+              <button
+                type="button"
+                onClick={handleSwapCurrencies}
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <ArrowRightLeft className="w-10 h-10 text-gray-400" />
+              </button>
             </div>
 
             <div className="flex-1 space-y-6">
               <div className="space-y-2">
                 <label htmlFor="toCurrency" className="block text-sm font-medium text-gray-700">
-                  To Currency
+                  To
                 </label>
                 <div className="flex items-center space-x-3">
                   <select
