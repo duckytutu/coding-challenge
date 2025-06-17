@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
-import { ArrowRightLeft } from 'lucide-react'
+import { ArrowRightLeft, Loader2 } from 'lucide-react'
 
 interface CurrencyPrice {
   price: number;
@@ -27,6 +27,7 @@ function App() {
   const [currencyPrices, setCurrencyPrices] = useState<CurrencyPrices>({});
   const [currencies, setCurrencies] = useState<string[]>([]);
   const [convertedAmount, setConvertedAmount] = useState<string>('');
+  const [isLoadingPrices, setIsLoadingPrices] = useState(true);
 
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<FormData>();
 
@@ -35,8 +36,9 @@ function App() {
   }, []);
 
   const fetchCurrencyData = async () => {
+    setIsLoadingPrices(true);
     try {
-      const response = await fetch('https://interview.switcheo.com/prices.json');
+      const response = await fetch('http://localhost:3000/api/prices');
       const data: CurrencyData[] = await response.json();
       
       const prices: CurrencyPrices = {};
@@ -53,6 +55,8 @@ function App() {
       setCurrencies(Object.keys(prices));
     } catch (error) {
       console.error('Error fetching currency data:', error);
+    } finally {
+      setIsLoadingPrices(false);
     }
   };
 
@@ -110,22 +114,28 @@ function App() {
                     id="fromCurrency"
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm h-12 px-4"
                     {...register('fromCurrency', { required: 'Please select a currency' })}
+                    disabled={isLoadingPrices}
                   >
                     <option value="">Select a currency</option>
                     {currencies.map(currency => (
                       <option key={currency} value={currency}>{currency}</option>
                     ))}
                   </select>
-                  {fromCurrency && (
-                    <img
-                      src={`https://raw.githubusercontent.com/Switcheo/token-icons/main/tokens/${fromCurrency}.svg`}
-                      alt={fromCurrency}
-                      className="w-6 h-6"
-                      onError={(e) => {
-                        e.currentTarget.src = 'https://raw.githubusercontent.com/Switcheo/token-icons/main/tokens/default.svg';
-                      }}
-                    />
-                  )}
+                  <div className="flex items-center space-x-2">
+                    {fromCurrency && (
+                      <img
+                        src={`https://raw.githubusercontent.com/Switcheo/token-icons/main/tokens/${fromCurrency}.svg`}
+                        alt={fromCurrency}
+                        className="w-6 h-6"
+                        onError={(e) => {
+                          e.currentTarget.src = 'https://raw.githubusercontent.com/Switcheo/token-icons/main/tokens/default.svg';
+                        }}
+                      />
+                    )}
+                    {isLoadingPrices && (
+                      <Loader2 className="w-5 h-5 text-indigo-600 animate-spin" />
+                    )}
+                  </div>
                 </div>
                 {errors.fromCurrency && (
                   <p className="mt-1 text-sm text-red-600">{errors.fromCurrency.message}</p>
@@ -146,6 +156,7 @@ function App() {
                     required: 'Please enter a valid amount',
                     min: { value: 0, message: 'Amount must be greater than 0' }
                   })}
+                  disabled={isLoadingPrices}
                 />
                 {errors.amount && (
                   <p className="mt-1 text-sm text-red-600">{errors.amount.message}</p>
@@ -158,6 +169,7 @@ function App() {
                 type="button"
                 onClick={handleSwapCurrencies}
                 className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                disabled={isLoadingPrices}
               >
                 <ArrowRightLeft className="w-10 h-10 text-gray-400" />
               </button>
@@ -173,22 +185,28 @@ function App() {
                     id="toCurrency"
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm h-12 px-4"
                     {...register('toCurrency', { required: 'Please select a currency' })}
+                    disabled={isLoadingPrices}
                   >
                     <option value="">Select a currency</option>
                     {currencies.map(currency => (
                       <option key={currency} value={currency}>{currency}</option>
                     ))}
                   </select>
-                  {toCurrency && (
-                    <img
-                      src={`https://raw.githubusercontent.com/Switcheo/token-icons/main/tokens/${toCurrency}.svg`}
-                      alt={toCurrency}
-                      className="w-6 h-6"
-                      onError={(e) => {
-                        e.currentTarget.src = 'https://raw.githubusercontent.com/Switcheo/token-icons/main/tokens/default.svg';
-                      }}
-                    />
-                  )}
+                  <div className="flex items-center space-x-2">
+                    {toCurrency && (
+                      <img
+                        src={`https://raw.githubusercontent.com/Switcheo/token-icons/main/tokens/${toCurrency}.svg`}
+                        alt={toCurrency}
+                        className="w-6 h-6"
+                        onError={(e) => {
+                          e.currentTarget.src = 'https://raw.githubusercontent.com/Switcheo/token-icons/main/tokens/default.svg';
+                        }}
+                      />
+                    )}
+                    {isLoadingPrices && (
+                      <Loader2 className="w-5 h-5 text-indigo-600 animate-spin" />
+                    )}
+                  </div>
                 </div>
                 {errors.toCurrency && (
                   <p className="mt-1 text-sm text-red-600">{errors.toCurrency.message}</p>
@@ -213,7 +231,8 @@ function App() {
           <div className="flex justify-center pt-4">
             <button
               type="submit"
-              className="px-8 py-3 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              className="px-8 py-3 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={isLoadingPrices}
             >
               CONFIRM SWAP
             </button>
